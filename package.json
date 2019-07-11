@@ -1,0 +1,31 @@
+{
+  "name": "emoji_arena",
+  "version": "0.1.0",
+  "description": "Fight to the death with emojis",
+  "main": "index.js",
+  "repository": "git@github.com:agonzalezmurua/emoji_arena.git",
+  "author": "AguGonzalez <agustingonzalezmurua@gmail.com>",
+  "scripts": {
+    "start": "NODE_ENV=production node dist/server/index.js",
+    "build": "tsc --project tsconfig.json",
+    "debug": "NODE_ENV=development nodemon"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "module-alias": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/node": "^12.6.2",
+    "nodemon": "^1.19.1",
+    "ts-node": "^8.3.0",
+    "tsconfig-paths": "^3.8.0",
+    "typescript": "^3.5.3"
+  },
+  "_moduleAliases": {
+    "#server": "dist/server/index.js"
+  }
+}
