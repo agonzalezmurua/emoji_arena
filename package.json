@@ -30,6 +30,7 @@
     "typescript": "^3.5.3"
   },
   "_moduleAliases": {
-    "#server": "dist/index.js"
+    "#server": "dist/index.js",
+    "#": "dist/"
   }
 }

@@ -1,9 +1,11 @@
 import Discord from "discord.js"
-import ms = require("ms");
-import Fighter from "models/fighter";
+import registerChatEvents from "./chat_events";
 
 const client = new Discord.Client()
 
 client.login(process.env.DISCORD_TOKEN)
+client.once("ready", () => {
+  registerChatEvents()
+})
 
 export default client
