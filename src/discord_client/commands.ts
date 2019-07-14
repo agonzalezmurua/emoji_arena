@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import * as executors from "./executors";
 
-export const prefix = "->"
+export const prefix = ">"
 
 type Commands = {
   [k: string]: {
