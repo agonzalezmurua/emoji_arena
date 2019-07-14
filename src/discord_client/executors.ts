@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
 import Fighter from "#/models/fighter";
+import { prefix } from "./commands"
 
 type Executor = (message: Message, ...opts: string[]) => Promise<any> ;
 
@@ -23,7 +24,7 @@ export const help: Executor = (message: Message) => {
 export const register: Executor = async (message: Message, [emojiString, name]) => {
   if (emojiString === undefined || name === undefined) {
     // Answer something about arguments IDK
-    return
+    return message.channel.send(`Invalid parameters... please use \`${prefix}register <:emoji:> <name>\``)
   }
   const emojiId = emojiString.match(/\d+/s)
   if (emojiId === null) {
@@ -42,8 +43,7 @@ export const register: Executor = async (message: Message, [emojiString, name]) 
     }]).exec()
 
   if (fighter !== null) {
-    console.log(fighter)
-    return console.log("Ya existe")
+    return message.channel.send("That emoji/name is already used")
   }
 
   await new Fighter({
