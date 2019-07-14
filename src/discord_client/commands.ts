@@ -2,6 +2,8 @@ import { Message } from "discord.js";
 import * as executors from "./executors";
 
 export const prefix = ">"
+export const confirmationEmoji = "✅"
+export const rejectionEmoji = "❎"
 
 type Commands = {
   [k: string]: {
@@ -22,6 +24,10 @@ const CHAT_COMMANDS: Commands = {
   "register": {
     matchExp: new RegExp(`${prefix}register`, "s"),
     exec: executors.register
+  },
+  "retire": {
+    matchExp: new RegExp(`${prefix}retire`, "s"),
+    exec: executors.retire
   }
 }
 export function getCommand(message: Message) {

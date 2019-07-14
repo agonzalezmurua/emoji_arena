@@ -1,8 +1,20 @@
-import { Message } from "discord.js";
+import { Message, Emoji, User, ReactionCollector, MessageReaction, Collection } from "discord.js";
 import Fighter from "#/models/fighter";
-import { prefix } from "./commands"
+import { prefix, confirmationEmoji, rejectionEmoji } from "./commands"
+import { isArray } from "util";
+import ms = require("ms");
+import client from ".";
 
-type Executor = (message: Message, ...opts: string[]) => Promise<any> ;
+type Executor = (message: Message, ...opts: string[]) => Promise<any>
+
+async function findGuildEmoji(message: Message, emojiString: string): Promise<Emoji | null> {
+  const emojiId = emojiString.match(/\d+/s)
+  if (emojiId === null) {
+    return null
+  }
+  const emoji = message.guild.emojis.find(({ id }) => id === emojiId[0])
+  return emoji
+}
 
 export const listEmojis: Executor = async (message: Message) => {
   const fighters = await Fighter.find({ guild: message.guild.id });
@@ -22,20 +34,17 @@ export const help: Executor = (message: Message) => {
 }
 
 export const register: Executor = async (message: Message, [emojiString, name]) => {
+  
   if (emojiString === undefined || name === undefined) {
     // Answer something about arguments IDK
     return message.channel.send(`Invalid parameters... please use \`${prefix}register <:emoji:> <name>\``)
   }
-  const emojiId = emojiString.match(/\d+/s)
-  if (emojiId === null) {
-    return message.channel.send("Dude, that's not an emoji I think")
-  }
-  const emoji = message.guild.emojis.find(({ id }) => id === emojiId[0])
-  if (emoji === null) {
-    return message.channel.send("I would love to accept external emojis but I'm afraid I cant")
-  }
+  const emoji = await findGuildEmoji(message, emojiString)
 
-  const fighter = await Fighter.findOne({guild: message.guild.id })
+  if (emoji === null) {
+    return message.channel.send("I wasn't able to find the emoji you requested")
+  }
+  const fighter = await Fighter.findOne({ guild: message.guild.id })
     .or([{
       emoji: emoji.id
     }, {
@@ -49,11 +58,53 @@ export const register: Executor = async (message: Message, [emojiString, name]) 
   await new Fighter({
     name: name,
     emoji_id: emoji.id,
-    guild: message.guild.id,
-    damage: 10,
-    health_points: 100,
+    guild: message.guild.id
   }).save()
 
-  message.channel.sendMessage(`${name} ${emoji} joins the fray!`)
-  
+  return message.channel.sendMessage(`${name} ${emoji} joins the fray!`)
+}
+
+export const retire: Executor = async (message: Message, [name]) => {
+  const issuer = message.author.id
+  const fighter = await Fighter.findOne({ guild: message.guild.id, name: name })
+  if (fighter === null) {
+    // TODO: NotExist message
+    return
+  }
+  const emoji = await findGuildEmoji(message, fighter.emoji_id)
+  const confirmationMessage = await message.reply(`Are you sure you want to retire ${name} ${emoji}`)
+
+  if (!isArray(confirmationMessage))  {
+    await Promise.all([
+      confirmationMessage.react(confirmationEmoji),
+      confirmationMessage.react(rejectionEmoji)
+    ])
+    try {
+      const collected = await confirmationMessage.awaitReactions((reaction, user: User) => {
+        return [confirmationEmoji, rejectionEmoji].includes(reaction.emoji.name) && user.id === issuer
+      }, {
+          max: 1,
+          time: ms("5s"),
+          maxEmojis: 2,
+          errors: ["time"]
+        })
+
+      const reaction = collected.first()
+
+      switch (reaction.emoji.toString()) {
+        case confirmationEmoji:
+          fighter.in_service = false
+          Promise.all([
+            message.channel.send(`${fighter.name} ${emoji} is now retired`),
+            fighter.save()
+          ])
+          break
+        case rejectionEmoji:
+          break
+      }
+
+    } catch (error) {
+      message.channel.send("You didn't answered my question, let's pretend this never happened...")
+    }
+  }
 }
