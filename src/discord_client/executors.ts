@@ -1,5 +1,6 @@
 import { Message, Emoji, User, ReactionCollector, MessageReaction, Collection } from "discord.js";
 import Fighter from "#/models/fighter";
+import Guild from "#/models/guild";
 import { prefix, confirmationEmoji, rejectionEmoji } from "./commands"
 import { isArray } from "util";
 import ms = require("ms");
@@ -52,16 +53,24 @@ export const help: Executor = (message: Message) => {
  * @param param1 
  */
 export const register: Executor = async (message: Message, [emojiString, name]) => {
-  
   if (emojiString === undefined || name === undefined) {
     // Answer something about arguments IDK
     return message.channel.send(`Invalid parameters... please use \`${prefix}register <:emoji:> <name>\``)
   }
-  const emoji = await findGuildEmoji(message, emojiString)
+  const [emoji, guild, emojicount] = await Promise.all([
+    findGuildEmoji(message, emojiString),
+    Guild.findOne({ guild_one: message.guild.id }),
+    Fighter.find({ guild: message.guild.id, in_service: true }).count()
+  ])
 
   if (emoji === null) {
     return message.channel.send("I wasn't able to find the emoji you requested")
   }
+  
+  if (guild!.max_fighters >= emojicount) {
+    return message.channel.send(`Your server has reached the maximum active fighters (${guild!.max_fighters})`)
+  }
+
   const fighter = await Fighter.findOne({ guild: message.guild.id })
     .or([{
       emoji: emoji.id
