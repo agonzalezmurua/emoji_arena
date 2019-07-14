@@ -30,6 +30,7 @@ const CHAT_COMMANDS: Commands = {
     exec: executors.retire
   }
 }
+
 export function getCommand(message: Message) {
   const result = Object.entries(CHAT_COMMANDS).find(([, { matchExp: reg }]) => reg.test(message.content))
   if (result !== undefined) {

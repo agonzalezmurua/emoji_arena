@@ -3,10 +3,14 @@ import Fighter from "#/models/fighter";
 import { prefix, confirmationEmoji, rejectionEmoji } from "./commands"
 import { isArray } from "util";
 import ms = require("ms");
-import client from ".";
 
 type Executor = (message: Message, ...opts: string[]) => Promise<any>
 
+/**
+ * Attempts to recover a specific emoji in the server
+ * @param message 
+ * @param emojiString 
+ */
 async function findGuildEmoji(message: Message, emojiString: string): Promise<Emoji | null> {
   const emojiId = emojiString.match(/\d+/s)
   if (emojiId === null) {
@@ -16,6 +20,10 @@ async function findGuildEmoji(message: Message, emojiString: string): Promise<Em
   return emoji
 }
 
+/**
+ * Lists all emojis registered on the server
+ * @param message 
+ */
 export const listEmojis: Executor = async (message: Message) => {
   const fighters = await Fighter.find({ guild: message.guild.id });
   if (fighters.length === 0) {
@@ -29,10 +37,20 @@ export const listEmojis: Executor = async (message: Message) => {
   message.channel.send(guildFighters.join("\t"))
 }
 
+/**
+ * Lists all available commands
+ * 
+ * TODO: Make this actually work
+ */
 export const help: Executor = (message: Message) => {
   return message.channel.send("Maybe I'll help");
 }
 
+/**
+ * Registers a new emoji for the guild
+ * @param message 
+ * @param param1 
+ */
 export const register: Executor = async (message: Message, [emojiString, name]) => {
   
   if (emojiString === undefined || name === undefined) {
@@ -64,6 +82,11 @@ export const register: Executor = async (message: Message, [emojiString, name]) 
   return message.channel.sendMessage(`${name} ${emoji} joins the fray!`)
 }
 
+/**
+ * Retires a emoji from the guild
+ * @param message 
+ * @param param1 
+ */
 export const retire: Executor = async (message: Message, [name]) => {
   const issuer = message.author.id
   const fighter = await Fighter.findOne({ guild: message.guild.id, name: name })

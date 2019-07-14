@@ -5,11 +5,17 @@ import { getCommand } from "./commands";
 
 const CHANNEL_NAME = "emoji-arena"
 
+/**
+ * Main handler for chat events
+ */
 export default function registerChatEvents() {
+  // Handle new messages
   client.on("message", async (message: Message) => {
-    if (message.author.bot) { // Ignore self messages
+    // Ignore self messages
+    if (message.author.bot) {
       return
     }
+    
     const guild = await Guild.findOne({ guild_id: message.guild.id })
     if (guild !== null) {
       if (message.channel.id === guild.broadcast_channel) {
@@ -18,6 +24,8 @@ export default function registerChatEvents() {
       // Ignore other channels
     }
   })
+
+  // Joining a Guiild
   client.on("guildCreate", async (guild) => {
     async function createChannel() {
       return guild.createChannel(CHANNEL_NAME, {
@@ -47,5 +55,6 @@ export default function registerChatEvents() {
     return guild.owner.send(`Thanks for having back me in your server ${guild.name}`)
     
   })
+
   console.log("Chat events registered")
 }
