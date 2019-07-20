@@ -59,7 +59,7 @@ export const register: Executor = async (message: Message, [emojiString, name]) 
   }
   const [emoji, guild, emojicount] = await Promise.all([
     findGuildEmoji(message, emojiString),
-    Guild.findOne({ guild_one: message.guild.id }),
+    Guild.findOne({ guild_id: message.guild.id }),
     Fighter.find({ guild: message.guild.id, in_service: true }).count()
   ])
 
