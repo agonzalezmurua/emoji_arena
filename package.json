@@ -6,9 +6,8 @@
   "repository": "git@github.com:agonzalezmurua/emoji_arena.git",
   "author": "AguGonzalez <agustingonzalezmurua@gmail.com>",
   "scripts": {
-    "start": "NODE_ENV=production node dist/server/index.js",
     "build": "tsc --project tsconfig.json",
-    "debug": "NODE_ENV=development nodemon"
+    "start": "NODE_ENV=development nodemon"
   },
   "license": "MIT",
   "dependencies": {
@@ -31,6 +30,6 @@
   },
   "_moduleAliases": {
     "#server": "dist/index.js",
-    "#": "dist/"
+    "#": "build/"
   }
 }
