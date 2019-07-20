@@ -67,7 +67,7 @@ export const register: Executor = async (message: Message, [emojiString, name]) 
     return message.channel.send("I wasn't able to find the emoji you requested")
   }
   
-  if (guild!.max_fighters >= emojicount) {
+  if (guild!.max_fighters <= emojicount) {
     return message.channel.send(`Your server has reached the maximum active fighters (${guild!.max_fighters})`)
   }
 
