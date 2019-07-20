@@ -1,9 +1,12 @@
 require("dotenv").config()
+const { SERVER_PORT, DB_NAME, NODE_ENV } = process.env
+if (NODE_ENV === "production") {
+  require("module-alias")
+}
 import Express from "express"
 import client from "./discord_client"
 import mongoose from "mongoose"
 
-const { SERVER_PORT, DB_NAME, DB_DEV_NAME, NODE_ENV } = process.env
 const app = Express()
 
 app.listen(SERVER_PORT, async () => {
