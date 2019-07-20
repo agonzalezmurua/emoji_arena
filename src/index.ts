@@ -10,7 +10,7 @@ import mongoose from "mongoose"
 const app = Express()
 
 app.listen(SERVER_PORT, async () => {
-  const collection = NODE_ENV === "production" ? DB_NAME : DB_DEV_NAME
+  const collection = NODE_ENV === "production" ? DB_NAME : `${DB_NAME}_dev`
   console.log("Using", collection)
   mongoose.connect(`mongodb://localhost/${collection}`, { useNewUrlParser: true })
   client.on("error", console.error)
